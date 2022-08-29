@@ -21,31 +21,31 @@ using namespace std;
 //some structures
 
 class Global {
-public:
-	int xres, yres;
-    float w;
-    float dir;
-	int col[2];
-	float pos[2];
-    Global();
+	public:
+		int xres, yres;
+		float w;
+		float dir;
+		int col[2];
+		float pos[2];
+		Global();
 } g;
 
 class X11_wrapper {
-private:
-	Display *dpy;
-	Window win;
-	GLXContext glc;
-public:
-	~X11_wrapper();
-	X11_wrapper();
-	void set_title();
-	bool getXPending();
-	XEvent getXNextEvent();
-	void swapBuffers();
-	void reshape_window(int width, int height);
-	void check_resize(XEvent *e);
-	void check_mouse(XEvent *e);
-	int check_keys(XEvent *e);
+	private:
+		Display *dpy;
+		Window win;
+		GLXContext glc;
+	public:
+		~X11_wrapper();
+		X11_wrapper();
+		void set_title();
+		bool getXPending();
+		XEvent getXNextEvent();
+		void swapBuffers();
+		void reshape_window(int width, int height);
+		void check_resize(XEvent *e);
+		void check_mouse(XEvent *e);
+		int check_keys(XEvent *e);
 } x11;
 
 //Function prototypes
@@ -84,12 +84,13 @@ Global::Global()
 	w = 20.0f;
 	xres = 400;
 	yres = 200;
-    dir = 25.0f;
-    col[0] = 150;
-    col[1] = 160;
-    col[2] = 220;
+	dir = 25.0f;
+	//added to allow color change on a more permanent basis 
+	col[0] = 150;
+	col[1] = 160;
+	col[2] = 220;
 	pos[0] = 0.0f+w;
-    pos[1] = g.yres / 2.0f;
+	pos[1] = g.yres / 2.0f;
 }
 
 X11_wrapper::~X11_wrapper()
@@ -122,7 +123,7 @@ X11_wrapper::X11_wrapper()
 		PointerMotionMask |
 		StructureNotifyMask | SubstructureNotifyMask;
 	win = XCreateWindow(dpy, root, 0, 0, w, h, 0, vi->depth,
-		InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
+			InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
 	set_title();
 	glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, glc);
@@ -165,22 +166,22 @@ void X11_wrapper::reshape_window(int width, int height)
 	glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 	glOrtho(0, g.xres, 0, g.yres, -1, 1);
 
-//hw for lab1 ... hopefully 
-	
+	//hw for lab1 ... hopefully 
+
 	if (g.xres < 200.0f) {
-	   glPushMatrix();
-       glColor3ub(220, 0, 0);
-	   glPopMatrix();
+		glPushMatrix();
+		glColor3ub(220, 0, 0);
+		glPopMatrix();
 	}
 	if (g.xres > 600.0f) {
-	   glPushMatrix();
-       glColor3ub(0, 0, 220);
-	   glPopMatrix();
+		glPushMatrix();
+		glColor3ub(0, 0, 220);
+		glPopMatrix();
 	}
 	if (g.xres < g.w) {
-	   glPushMatrix();
-       glColor3ub(0, 0, 0);
-	   glPopMatrix();
+		glPushMatrix();
+		glColor3ub(0, 0, 0);
+		glPopMatrix();
 	}
 
 }
@@ -206,8 +207,8 @@ void X11_wrapper::check_mouse(XEvent *e)
 
 	//Weed out non-mouse events
 	if (e->type != ButtonRelease &&
-		e->type != ButtonPress &&
-		e->type != MotionNotify) {
+			e->type != ButtonPress &&
+			e->type != MotionNotify) {
 		//This is not a mouse event that we care about.
 		return;
 	}
@@ -271,34 +272,34 @@ void init_opengl(void)
 
 void physics()
 {
-    g.pos[0] += g.dir;
-    if(g.pos[0] >= (g.xres - g.w)) {
-       g.pos[0] = (g.xres -g.w);
-       g.dir = -g.dir;
+	g.pos[0] += g.dir;
+	if(g.pos[0] >= (g.xres - g.w)) {
+		g.pos[0] = (g.xres -g.w);
+		g.dir = -g.dir;
 	}
-    if (g.pos[0] <= g.w) {
-       g.pos[0] = g.w;
-       g.dir = -g.dir;
-	}
-
-	//makes the box stop moving but changes the color appropriately 
-
-	if(g.xres < 200.0f) {
-       g.col[0] = 200;
-       g.col[1] = 0;
-       g.col[2] = 0;
-	}
-	if(g.xres > 600.0f) {
-       g.col[0] = 0;
-       g.col[1] = 0;
-       g.col[2] = 200;
+	if (g.pos[0] <= g.w) {
+		g.pos[0] = g.w;
+		g.dir = -g.dir;
+		if(g.xres < 200.0f) {
+			g.col[0] = 200;
+			g.col[1] = 0;
+			g.col[2] = 0;
+		} 
+		if(g.xres > 600.0f) {
+			g.col[0] = 0;
+			g.col[1] = 0;
+			g.col[2] = 200;
+			//exact same code for red and blue but blue only blips and 
+			//red stays red in whole movement 
+			//asked tutors why it was like this and they had no clue
+			//maybe my if statements?
+		}
 	}
 	if(g.xres < g.w) {
-       g.col[0] = 200;
-       g.col[1] = 200;
-       g.col[2] = 200;
+		g.col[0] = 200;
+		g.col[1] = 200;
+		g.col[2] = 200;
 	}
-//moves box side to side
 }
 
 void render()
@@ -309,10 +310,10 @@ void render()
 	glColor3ub(g.col[0], g.col[1], g.col[2]);
 	glTranslatef(g.pos[0], g.pos[1], 0.0f);
 	glBegin(GL_QUADS);
-		glVertex2f(-g.w, -g.w);
-		glVertex2f(-g.w,  g.w);
-		glVertex2f( g.w,  g.w);
-		glVertex2f( g.w, -g.w);
+	glVertex2f(-g.w, -g.w);
+	glVertex2f(-g.w,  g.w);
+	glVertex2f( g.w,  g.w);
+	glVertex2f( g.w, -g.w);
 	glEnd();
 	glPopMatrix();
 }
